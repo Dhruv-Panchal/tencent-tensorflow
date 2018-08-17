@@ -1,31 +1,33 @@
 import json
 from pprint import pprint
+from PIL import Image
+import os
 
 with open('annotations.json') as f:
     x = f.read()
     data = json.loads(x)
 
+def crop(image_path, coords, saved_location):
+    image_obj = Image.open(image_path)
+    cropped_image = image_obj.crop(coords)
+    cropped_image.save(saved_location)
+
+count = 0
 
 for p in [data['imgs']]:
     for q in [p.items()]:
-        print ("images"),(q[2][0])
-        imglen = int(len(q)) # finds list length of 'imgs' list
-        print ("imglen"),(imglen)
+        imglen = int(len(q))
         for v in range(imglen):
             for r in [q[v]]: # image name iterator
-                #print ("images"),(r[0])
-
                 for s in [r[1]]:
-                    #print("***********"), ("Path: "),(s['path'])
-                    print ("***********"),("Image name: ") ,(s['id'])
+                    print ("***********"),("Image Path: ") ,(s['path'])
                     for t in [s['objects']]:
                         objlen=int(len(t))
-                        #print (objlen)
                         for i in range(objlen):
                             for u in [t[i]]:
-
-                                '''print ("***********"), ("Category: "),(u['category'])
-                                print ("Xmin: "),(u["bbox"]['xmin'])
-                                print ("Ymin: "),(u["bbox"]['ymin'])
-                                print ("Xmax: "),(u["bbox"]['xmax'])
-                                print ("Ymax: "),(u["bbox"]['ymax'])'''
+                                filename = 'cropped1/'+u['category']
+                                if not os.path.exists(filename):
+                                    os.makedirs(filename)
+                                crop(s['path'], (u["bbox"]['xmin'], u["bbox"]\
+                                ['ymin'],u["bbox"]['xmax'],u["bbox"]['ymax']),\
+                                 'cropped1/'+u['category']+'/'+str(s['id'])+'.jpg')
